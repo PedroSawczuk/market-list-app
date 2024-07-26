@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../../db/FirebaseDatabase.dart';
 import '../../routes/AppRoutes.dart';
 import '../../utils/AppCustom.dart';
 
@@ -11,8 +11,10 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,89 +34,113 @@ class _LoginPageState extends State<LoginPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            AppCustom.SB10,
-            Container(
-              width: 300,
-              height: 200,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/Login.png'),
-                ),
-              ),
-            ),
-            AppCustom.SB30,
-            TextFormField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'E-mail',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email_outlined),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-            ),
-            AppCustom.SB10,
-            TextFormField(
-              controller: passwordController,
-              decoration: InputDecoration(
-                labelText: 'Senha',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock_outlined),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              ),
-              obscureText: true,
-            ),
-            AppCustom.SB10,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.signUpPage);
-                  },
-                  child: Text(
-                    'Não tem uma conta? Clique aqui! :)',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppCustom.colorBlue,
-                    ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              AppCustom.SB10,
+              Container(
+                width: 300,
+                height: 200,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/Login.png'),
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.forgotPasswordPage);
-                  },
-                  child: Text(
-                    'Esqueceu minha senha',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppCustom.colorBlue,
+              ),
+              AppCustom.SB30,
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'E-mail',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email_outlined),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira um email!';
+                  }
+                  return null;
+                },
+              ),
+              AppCustom.SB10,
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                  labelText: 'Senha',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock_outlined),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                ),
+                obscureText: true,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira uma senha';
+                  }
+                  return null;
+                },
+              ),
+              AppCustom.SB10,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRoutes.signUpPage);
+                    },
+                    child: Text(
+                      'Não tem uma conta? Clique aqui! :)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppCustom.colorBlue,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            AppCustom.SB20,
-            ElevatedButton.icon(
-              onPressed: () {
-                var email = emailController.text;
-                var password = passwordController.text;
-
-                print('${email} ${password}');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppCustom.colorOrange,
-                foregroundColor: AppCustom.colorWhite,
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRoutes.forgotPasswordPage);
+                    },
+                    child: Text(
+                      'Esqueceu minha senha',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppCustom.colorBlue,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              icon: Icon(Icons.login),
-              label: Text('Entrar'),
-            ),
-          ],
+              AppCustom.SB20,
+              ElevatedButton.icon(
+                onPressed: () {
+                  _loginFunction();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppCustom.colorOrange,
+                  foregroundColor: AppCustom.colorWhite,
+                ),
+                icon: Icon(Icons.login),
+                label: Text('Entrar'),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void _loginFunction() {
+    if (_formKey.currentState!.validate()) {
+      String email = _emailController.text;
+      String password = _passwordController.text;
+      _firebaseDatabase.signInUser(
+        context: context,
+        email: email,
+        password: password,
+      );
+    }
   }
 }
