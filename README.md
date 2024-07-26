@@ -4,7 +4,7 @@
 Aplicativo de lista de supermercados. Onde pode te auxíliar a não esquecer mais as compras.
 
 ## Desenvolvedor
-Aplicativo desenvolvido por <a href="">Pedro Sawczuk</a> para estudos de Flutter, Dart e Firebase! 
+Aplicativo desenvolvido por <a href="github.com/PedroSawczuk">Pedro Sawczuk</a> para estudos de Flutter, Dart e Firebase! 
 
 ## Tecnologias Utilizadas:
 ![Firebase](https://img.shields.io/badge/Firebase-F29D0C?style=for-the-badge&logo=firebase&logoColor=white)
