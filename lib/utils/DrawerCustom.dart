@@ -31,20 +31,6 @@ class DrawerCustom extends StatelessWidget {
             title: Text('Página Inicial'),
           ),
           ListTile(
-            leading: Icon(Icons.shopping_cart_rounded),
-            onTap: () {
-              // Add Function
-            },
-            title: Text('Compras'),
-          ),
-          ListTile(
-            leading: Icon(Icons.person),
-            onTap: () {
-              // Add Function
-            },
-            title: Text('Meu Perfil'),
-          ),
-          ListTile(
             leading: Icon(Icons.developer_mode),
             onTap: () {
               print('Entrnado na página de Desenvolvedor');
@@ -53,14 +39,13 @@ class DrawerCustom extends StatelessWidget {
             title: Text('Desenvolvedor'),
           ),
 
-          // Adicionar após fazer a autenticação
-          // ListTile(
-          //   leading: Icon(Icons.logout),
-          //   onTap: () {
-          //     // Add Function
-          //   },
-          //   title: Text('Sair'),
-          // ),
+          ListTile(
+            leading: Icon(Icons.shop_two),
+            onTap: () {
+              Navigator.pushNamed(context, AppRoutes.productsPage);
+            },
+            title: Text('Produtos Comprados'),
+          ),
         ],
       ),
     );

@@ -1,4 +1,4 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +6,7 @@ import '../routes/AppRoutes.dart';
 
 class FirebaseDatabase {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> createNewUser({
     required BuildContext context,
@@ -84,4 +84,35 @@ class FirebaseDatabase {
       );
     }
   }
+
+  Future<void> addProduct({
+    required BuildContext context,
+    required String productName,
+    required int productQuant,
+    required bool completed,
+  }) async {
+    try {
+      CollectionReference product = _firestore.collection('Product');
+      await product.add({
+        'productName': productName,
+        'productQuant': productQuant,
+        'completed': false,
+        'created_at': Timestamp.now(),
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Produto adicionado com sucesso'),
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ${e}'),
+        ),
+      );
+    }
+  }
 }
+
+
