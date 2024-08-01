@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:market_list_app/routes/AppRoutes.dart';
+import '../db/FirebaseDatabase.dart';
 import '../utils/AppCustom.dart';
 
 class DrawerCustom extends StatelessWidget {
@@ -38,13 +39,20 @@ class DrawerCustom extends StatelessWidget {
             },
             title: Text('Desenvolvedor'),
           ),
-
           ListTile(
             leading: Icon(Icons.shop_two),
             onTap: () {
               Navigator.pushNamed(context, AppRoutes.productsPage);
             },
             title: Text('Produtos Comprados'),
+          ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            onTap: () {
+              final FirebaseDatabase db = FirebaseDatabase();
+              db.logout(context);
+            },
+            title: Text('Logout'),
           ),
         ],
       ),

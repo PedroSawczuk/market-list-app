@@ -51,13 +51,22 @@ class AddProductPageState extends State<AddProductPage> {
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 15, horizontal: 15),
               ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value != null && value.isNotEmpty) {
+                  if (int.tryParse(value) == null) {
+                    return 'Por favor, insira um número válido';
+                  }
+                }
+                return null;
+              },
             ),
             AppCustom.SB10,
             ElevatedButton(
               onPressed: () {
                 _addProduct();
               },
-              child: Text('Adicinar Produto'),
+              child: Text('Adicionar Produto'),
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppCustom.colorWhite,
                 backgroundColor: AppCustom.colorOrange,
@@ -73,7 +82,13 @@ class AddProductPageState extends State<AddProductPage> {
   void _addProduct() {
     if (_formKey.currentState!.validate()) {
       String productName = _productNameController.text;
-      int productQuant = int.parse(_productQuantController.text);
+      int productQuant = 1; // Quantidade padrão
+
+      // Se o campo de quantidade não estiver vazio, use o valor inserido
+      if (_productQuantController.text.isNotEmpty) {
+        productQuant = int.parse(_productQuantController.text);
+      }
+
       bool completed = false;
       _firebaseDatabase.addProduct(
         context: context,
@@ -81,7 +96,9 @@ class AddProductPageState extends State<AddProductPage> {
         productQuant: productQuant,
         completed: completed,
       );
+      // Limpar os campos após a adição do produto
+      _productNameController.clear();
+      _productQuantController.clear();
     }
-    ;
   }
 }

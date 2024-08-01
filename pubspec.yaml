@@ -39,7 +39,7 @@ dependencies:
   cloud_firestore: ^5.1.0
   firebase_core: ^3.2.0
   url_launcher: ^6.3.0
-  # google_fonts: ^6.2.1 # Fonts do google
+  shared_preferences: ^2.2.3
   
 dev_dependencies:
   flutter_test:

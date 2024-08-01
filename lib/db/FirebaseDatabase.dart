@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'locallyDatabase.dart';
 import '../routes/AppRoutes.dart';
 
 class FirebaseDatabase {
@@ -14,15 +14,19 @@ class FirebaseDatabase {
     required String password,
   }) async {
     try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+      User? user = userCredential.user;
+      if (user != null) {
+        await saveUserLocally(
+            LocalUser(userId: user.uid, email: user.email ?? ''));
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cadastro realizado com sucesso!')),
       );
-      print('cadastrado com sucesso!');
-      print('Email: $email /// Senha: $password');
       Navigator.pushReplacementNamed(context, AppRoutes.loginPage);
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -41,15 +45,19 @@ class FirebaseDatabase {
     required String password,
   }) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      User? user = userCredential.user;
+      if (user != null) {
+        await saveUserLocally(
+            LocalUser(userId: user.uid, email: user.email ?? ''));
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login realizado com sucesso!')),
       );
-      print('logado com sucesso!');
-      print('Email: $email');
       Navigator.pushReplacementNamed(context, AppRoutes.homePage);
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -92,19 +100,29 @@ class FirebaseDatabase {
     required bool completed,
   }) async {
     try {
-      CollectionReference product = _firestore.collection('Product');
-      await product.add({
-        'productName': productName,
-        'productQuant': productQuant,
-        'completed': false,
-        'created_at': Timestamp.now(),
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Produto adicionado com sucesso'),
-        ),
-      );
-      Navigator.pop(context);
+      User? user = _firebaseAuth.currentUser;
+      if (user != null) {
+        CollectionReference product = _firestore.collection('Product');
+        await product.add({
+          'productName': productName,
+          'productQuant': productQuant,
+          'completed': completed,
+          'userId': user.uid,
+          'created_at': Timestamp.now(),
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Produto adicionado com sucesso'),
+          ),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Usuário não autenticado!'),
+          ),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -113,6 +131,10 @@ class FirebaseDatabase {
       );
     }
   }
+
+  Future<void> logout(BuildContext context) async {
+    await removeUserLocally();
+    await _firebaseAuth.signOut();
+    Navigator.pushReplacementNamed(context, AppRoutes.loginPage);
+  }
 }
-
-

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:market_list_app/utils/DrawerCustom.dart';
 import '../routes/AppRoutes.dart';
@@ -12,6 +13,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late String userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentUser();
+  }
+
+  void _getCurrentUser() {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userId = user.uid;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,27 +44,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       drawer: DrawerCustom(),
-      // body: SingleChildScrollView(
-      //   child: Column(
-      //     children: [
-      //       AppCustom.SB20,
-      //       Center(
-      //         child: Text(
-      //           'Lista de Produtos',
-      //           style: TextStyle(
-      //             fontSize: 25,
-      //             fontWeight: FontWeight.bold,
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
-
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('Product')
             .where('completed', isEqualTo: false)
+            .where('userId', isEqualTo: userId) // Filtra pelo ID do usuário
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   ListTile(
                     title: Text(
-                      'Nome do produto: ${productData['productName']}',
+                      productData['productName'],
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 17,
@@ -125,7 +125,6 @@ class _HomePageState extends State<HomePage> {
           );
         },
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppCustom.colorOrange,
         tooltip: 'Adicionar',
